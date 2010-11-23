@@ -1,0 +1,31 @@
+function parse_git_branch {
+ref=$(git symbolic-ref HEAD 2> /dev/null) || return
+echo " ("${ref#refs/heads/}")"
+}
+
+case $TERM in
+xterm*)
+if [ -e /etc/sysconfig/bash-prompt-xterm ]; then
+PROMPT_COMMAND=/etc/sysconfig/bash-prompt-xterm
+else
+PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\007"'
+fi
+;;
+screen)
+PROMPT_COMMAND='echo -ne "\033_${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\033\\"'
+;;
+*)
+[ -e /etc/sysconfig/bash-prompt-default ] && PROMPT_COMMAND=/etc/sysconfig/bash-prompt-default
+;;
+esac
+
+RED="\[\033[0;31m\]"
+YELLOW="\[\033[0;33m\]"
+GREEN="\[\033[0;32m\]"
+CYAN="\[\033[0;36m\]"
+export TERM=xterm-color
+export GREP_OPTIONS='--color=auto' GREP_COLOR='1;32'
+export CLICOLOR=1
+export LSCOLORS=eHFxCxDxBxegedabagacad
+
+PS1="\[[\033[0;32m\]\u\[\033[0;37m\]@\[\033[0;32m\]\h\[\033[0;37m\]:\[\033[0;31m\]\w\[\033[0m\]]$YELLOW\$(parse_git_branch)\[\033[0m\]$ "
